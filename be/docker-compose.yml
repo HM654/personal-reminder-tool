@@ -1,0 +1,6 @@
+services:
+  personalremindertool.api:
+    image: ${DOCKER_REGISTRY-}personalremindertool.api
+    build:
+      context: .
+      dockerfile: PersonalReminderTool.Api/Dockerfile
