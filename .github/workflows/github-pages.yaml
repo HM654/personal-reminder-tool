@@ -28,6 +28,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: lts/*
+          cache-dependency-path: ./fe/package-lock.json
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
