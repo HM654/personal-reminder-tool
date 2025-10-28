@@ -35,18 +35,20 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.UseAsyncSeeding(async (context, _, cancellationToken) =>
+
+    // Synchronous seeding to support EF migrations in deployments
+    options.UseSeeding((context, _) =>
     {
         var baseUser = builder.Configuration
             .GetSection("BaseUser")
             .Get<User>()!;
 
-        bool exists = await context.Set<User>().AnyAsync(u => u.Id == baseUser.Id);
+        bool exists = context.Set<User>().Any(u => u.Id == baseUser.Id);
 
         if (!exists)
         {
-            await context.Set<User>().AddAsync(baseUser);
-            await context.SaveChangesAsync();
+            context.Set<User>().Add(baseUser);
+            context.SaveChanges();
         }
     });
 });
