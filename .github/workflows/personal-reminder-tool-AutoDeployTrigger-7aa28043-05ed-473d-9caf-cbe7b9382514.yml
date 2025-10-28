@@ -34,9 +34,8 @@ jobs:
       - name: Build and push container image to registry
         uses: azure/container-apps-deploy-action@v2
         with:
-          appSourcePath: ${{ github.workspace }}/be/PersonalReminderTool.Api
-          _dockerfilePathKey_: _dockerfilePath_
-          _targetLabelKey_: _targetLabel_
+          appSourcePath: ${{ github.workspace }}/be
+          dockerfilePath: ${{ github.workspace }}/be/PersonalReminderTool.Api/Dockerfile
           registryUrl: personalremindertoolapi.azurecr.io
           registryUsername: ${{ secrets.PERSONALREMINDERTOOL_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.PERSONALREMINDERTOOL_REGISTRY_PASSWORD }}
@@ -45,6 +44,7 @@ jobs:
           imageToBuild: personalremindertoolapi.azurecr.io/personal-reminder-tool:${{ github.sha }}
           _buildArgumentsKey_: |
             _buildArgumentsValues_
+
 
 
 
