@@ -2,8 +2,7 @@ name: Trigger auto deployment for personal-reminder-tool
 
 on:
   push:
-    branches: 
-      [ main ]
+    branches: [ main ]
     paths:
     - 'be/**'
     - '.github/workflows/azure-container.yml'
@@ -39,6 +38,7 @@ jobs:
           containerAppName: personal-reminder-tool
           resourceGroup: my-resource-group
           imageToBuild: personalremindertoolapi.azurecr.io/personal-reminder-tool:${{ github.sha }}
+
 
 
 
