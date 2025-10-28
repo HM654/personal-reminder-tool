@@ -7,7 +7,7 @@ on:
     branches: 
       [ main ]
     paths:
-    - '**'
+    - 'be/**'
     - '.github/workflows/personal-reminder-tool-AutoDeployTrigger-7aa28043-05ed-473d-9caf-cbe7b9382514.yml'
 
   # Allow manual trigger 
@@ -42,6 +42,7 @@ jobs:
           containerAppName: personal-reminder-tool
           resourceGroup: my-resource-group
           imageToBuild: personalremindertoolapi.azurecr.io/personal-reminder-tool:${{ github.sha }}
+
 
 
 
