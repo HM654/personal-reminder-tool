@@ -1,7 +1,7 @@
 ﻿using PersonalReminderTool.Api.Features.Reminders.Endpoints;
 using PersonalReminderTool.Api.Features.Users.Endpoints;
 
-namespace PersonalReminderTool.Api;
+namespace PersonalReminderTool.Api.Extensions;
 
 internal static class RouteBuilder
 {

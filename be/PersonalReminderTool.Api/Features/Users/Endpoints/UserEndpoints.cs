@@ -25,7 +25,7 @@ internal static class UserEndpoints
         var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
         if (user is null)
-            return Results.Unauthorized();
+            return Results.BadRequest("User does not exist.");
 
         var passwordHasher = new PasswordHasher<User>();
         var result = passwordHasher.VerifyHashedPassword(user, user.Password, request.Password);
@@ -39,7 +39,7 @@ internal static class UserEndpoints
         await context.RefreshTokens.AddAsync(refreshTokenRecord, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
-        httpContext.Response.Cookies.Append("refreshToken", refreshTokenRecord.Token, CreateSecureCookieOptions());
+        httpContext.Response.Cookies.Append("refreshToken", refreshTokenRecord.Token, TokenService.CreateSecureCookieOptions());
 
         return Results.Ok(jwt);
     }
@@ -67,16 +67,8 @@ internal static class UserEndpoints
 
         await context.SaveChangesAsync(cancellationToken);
 
-        httpContext.Response.Cookies.Append("refreshToken", newRefreshToken, CreateSecureCookieOptions());
+        httpContext.Response.Cookies.Append("refreshToken", newRefreshToken, TokenService.CreateSecureCookieOptions());
 
         return Results.Ok(newJwt);
     }
-
-    private static CookieOptions CreateSecureCookieOptions() => new()
-    {
-        HttpOnly = true,
-        Secure = true,
-        SameSite = SameSiteMode.None,
-        Expires = DateTime.UtcNow.AddDays(14)
-    };
 }

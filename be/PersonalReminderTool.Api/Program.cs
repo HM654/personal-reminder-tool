@@ -1,12 +1,7 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using PersonalReminderTool.Api;
 using PersonalReminderTool.Api.Data;
-using PersonalReminderTool.Api.Data.Entities;
+using PersonalReminderTool.Api.Extensions;
 using PersonalReminderTool.Api.Features.Reminders.Services;
 using PersonalReminderTool.Api.Features.Users.Services;
-using System.Text;
 using TickerQ.Dashboard.DependencyInjection;
 using TickerQ.DependencyInjection;
 using TickerQ.EntityFrameworkCore.DependencyInjection;
@@ -32,26 +27,7 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-
-    // Synchronous seeding to support EF migrations in deployments
-    options.UseSeeding((context, _) =>
-    {
-        var baseUser = builder.Configuration
-            .GetSection("BaseUser")
-            .Get<User>()!;
-
-        bool exists = context.Set<User>().Any(u => u.Id == baseUser.Id);
-
-        if (!exists)
-        {
-            context.Set<User>().Add(baseUser);
-            context.SaveChanges();
-        }
-    });
-});
+await builder.Services.SetupPostgreSQLDatabaseAsync(builder.Configuration);
 
 builder.Services.AddTickerQ(options =>
 {
@@ -74,28 +50,13 @@ builder.Services.AddSingleton<ISmsService, SmsService>();
 builder.Services.AddScoped<ReminderService>();
 
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(jwtOptions =>
-    {
-
-        jwtOptions.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
-        };
-    });
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await db.Database.MigrateAsync();
+    await app.MigrateDatabaseAsync();
 }
 
 app.UseCors(corsPolicy);

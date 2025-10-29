@@ -47,4 +47,12 @@ internal sealed class TokenService(IConfiguration configuration)
     };
 
     public string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+
+    public static CookieOptions CreateSecureCookieOptions() => new()
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.None,
+        Expires = DateTime.UtcNow.AddDays(14)
+    };
 }
