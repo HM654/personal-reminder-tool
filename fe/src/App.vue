@@ -2,14 +2,19 @@
 import { tryLogin, isLoggedIn, isCheckingAuth } from './auth';
 import Home from './views/Home.vue';
 import Login from './views/Login.vue';
+import Alert from '@/components/Alert.vue'
+import { useAlert } from './composables/alert';
 
 tryLogin()
+
+const { showAlert, alertMessage, alertType } = useAlert()
 </script>
 
 <template>
   <span v-if="isCheckingAuth" class="loader"></span>
   <Login v-else-if="!isLoggedIn" />
   <Home v-else />
+    <Alert :show="showAlert" :message="alertMessage" :type="alertType" />
 </template>
 
 <style scoped>

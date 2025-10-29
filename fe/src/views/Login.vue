@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import api from '@/api'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { setAccessToken } from "../auth";
 import calenderImg from '@/assets/calender.webp';
+import { useAlert } from '@/composables/alert'
+
+const { displayAlert } = useAlert()
 
 interface LoginDto {
   email: string
@@ -12,16 +15,32 @@ interface LoginDto {
 const email = ref('')
 const password = ref('')
 
-function Submit(){
+const fieldsPopulated = computed(() => {
+  return (
+    !!email.value &&
+    !!password.value
+  )
+})
+
+async function Submit(){
   const loginDto: LoginDto = {
     email: email.value,
     password: password.value
   }
   
-  api.post('/login', loginDto)
-  .then(response => {
+  try {
+    const response = await api.post('/login', loginDto)
     setAccessToken(response.data)
-  })
+    displayAlert('Login successful!', 'success')
+  } catch (error: any) {
+    let errorMessage = 'Login failed. Please try again.'
+    if (error.response?.status === 401) {
+      errorMessage = 'Invalid email or password.'
+    } else if (error.response?.status === 400 && error.response?.data) {
+      errorMessage = error.response.data
+    }
+    displayAlert(errorMessage, 'failure')
+  }
 }
 </script>
 
@@ -38,7 +57,7 @@ function Submit(){
           <input id="password" v-model="password" type="password" />
         </div>
       </div>
-      <button @click="Submit">Login</button>
+      <button :disabled="!fieldsPopulated" @click="Submit">Login</button>
     </div>
 </template>
 
@@ -94,6 +113,13 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: 0.2s ease;
+}
+
+button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.7;
 }
 
 button:hover {

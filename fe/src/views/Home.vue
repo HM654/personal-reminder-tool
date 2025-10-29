@@ -1,22 +1,26 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import Platforms from './Platforms.vue';
+import Platforms from '../components/Platforms.vue';
 import api from '@/api'
 import calenderImg from '@/assets/calender.webp';
-import Alert from './Alert.vue';
+import { useAlert } from '@/composables/alert'
+
+const { displayAlert } = useAlert()
+
+interface ReminderDto {
+  platforms: number
+  reminderMessage: string
+  scheduledDateTime: string
+  timeZone: string
+}
 
 const platformsSelected = ref(0)
 const reminderMessage = ref('')
-const datetime = ref<string>('')
+const scheduledDateTime  = ref<string>('')
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-const showAlert = ref(false)
-const alertMessage = ref('')
-const alertType = ref<'success' | 'failure'>('success')
-
 const minDateTime = computed(() => {
-  const now = new Date();
-  
+  const now = new Date(); 
   return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
   .toISOString()
   .slice(0, 16);
@@ -26,38 +30,34 @@ const fieldsPopulated = computed(() => {
   return (
     platformsSelected.value > 0 &&
     !!reminderMessage.value &&
-    !!datetime.value
+    !!scheduledDateTime .value
   )
 })
 
-interface ReminderDto {
-  platforms: number
-  reminderMessage: string
-  scheduledDateTime: string
-  timeZone: string
+function resetForm() {
+  reminderMessage.value = '';
+  scheduledDateTime.value = '';
 }
 
 async function Submit(){
   const reminderDto: ReminderDto = {
     platforms: platformsSelected.value,
     reminderMessage: reminderMessage.value,
-    scheduledDateTime: datetime.value,
+    scheduledDateTime: scheduledDateTime .value,
     timeZone: userTimeZone
   }
   
   try {
     await api.post('/set-reminder', reminderDto)
-    
-    alertMessage.value = 'Reminder set successfully!'
-    alertType.value = 'success'
-    reminderMessage.value = ''
-    datetime.value = ''
-  } catch (error: any) {  
-    alertMessage.value = 'Failed to set reminder. Please try again.'
-    alertType.value = 'failure'
-  } finally {
-    showAlert.value = true
-    setTimeout(() => (showAlert.value = false), 3000)
+    displayAlert('Reminder set successfully!', 'success');
+    resetForm()
+  } catch (error: any) { 
+    let errorMessage = 'Failed to set reminder. Please try again.'
+    if (error.response?.status === 400 && error.response?.data) {
+      errorMessage = error.response?.data
+      console.log(errorMessage)
+    }
+    displayAlert(errorMessage, 'failure');
   }
 }
 </script>
@@ -69,12 +69,10 @@ async function Submit(){
       <h2>Reminder</h2>
       <div class="reminder-container">
         <textarea v-model="reminderMessage" maxlength="160" rows="3"></textarea>
-        <input type=datetime-local v-model="datetime" :min="minDateTime"/>
+        <input type=datetime-local v-model="scheduledDateTime" :min="minDateTime"/>
       </div>
       <button :disabled="!fieldsPopulated" @click="Submit">Remind Me!</button>
     </div>
-
-    <Alert :show="showAlert" :message="alertMessage" :type="alertType" />
 </template>
 
 <style scoped>
