@@ -23,17 +23,19 @@ internal sealed class ReminderService(ITimeTickerManager<TimeTicker> timeTickerM
     }
 
     [TickerFunction(nameof(SendReminderAsync))]
-    public async Task SendReminderAsync(TickerFunctionContext<Reminder> tickerContext, CancellationToken cancellationToken)
-    {
-        var platforms = tickerContext.Request.Platforms;
+    public async Task SendReminderAsync(TickerFunctionContext<Reminder> tickerContext, CancellationToken cancellationToken) => await HandleReminderAsync(tickerContext.Request, cancellationToken);
 
-        if (platforms.HasFlag(Platforms.SMS) && tickerContext.Request.UserPhoneNumber is not null)
+    public async Task HandleReminderAsync(Reminder reminder, CancellationToken cancellationToken)
+    {
+        var platforms = reminder.Platforms;
+
+        if (platforms.HasFlag(Platforms.SMS) && reminder.UserPhoneNumber is not null)
         {
-            await smsService.SendSmsAsync(tickerContext.Request.UserPhoneNumber, tickerContext.Request.ReminderMessage);
+            await smsService.SendSmsAsync(reminder.UserPhoneNumber, reminder.ReminderMessage, cancellationToken);
         }
         if (platforms.HasFlag(Platforms.Email))
         {
-            await emailService.SendEmailAsync(tickerContext.Request.UserEmail, "Reminder", tickerContext.Request.ReminderMessage, cancellationToken);
+            await emailService.SendEmailAsync(reminder.UserEmail, "Reminder", reminder.ReminderMessage, cancellationToken);
         }
     }
 }

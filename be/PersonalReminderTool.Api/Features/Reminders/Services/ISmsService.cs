@@ -1,6 +1,6 @@
 ﻿namespace PersonalReminderTool.Api.Features.Reminders.Services;
 
-public interface ISmsService
+internal interface ISmsService
 {
-    Task SendSmsAsync(string to, string message);
+    public Task SendSmsAsync(string to, string message, CancellationToken cancellationToken);
 }

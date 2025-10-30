@@ -34,7 +34,7 @@ internal static class UserEndpoints
             return Results.Unauthorized();
 
         var jwt = tokenService.GenerateJwt(user);
-        var refreshTokenRecord = tokenService.CreateRefreshTokenRecord(user);
+        var refreshTokenRecord = tokenService.CreateRefreshToken(user.Id);
 
         await context.RefreshTokens.AddAsync(refreshTokenRecord, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -48,8 +48,8 @@ internal static class UserEndpoints
     {
         if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshTokenSent))
             return Results.Unauthorized();
-
-        RefreshToken? refreshToken = await context.RefreshTokens
+        
+        var refreshToken = await context.RefreshTokens
             .Include(rt => rt.User)
             .FirstOrDefaultAsync(rt => rt.Token == refreshTokenSent, cancellationToken);
 
@@ -60,7 +60,7 @@ internal static class UserEndpoints
             return Results.Unauthorized();
 
         var newJwt = tokenService.GenerateJwt(refreshToken.User);
-        var newRefreshToken = tokenService.GenerateRefreshToken();
+        var newRefreshToken = tokenService.GenerateRefreshTokenString();
 
         refreshToken.Token = newRefreshToken;
         refreshToken.UtcExpiry = DateTime.UtcNow.AddDays(14);

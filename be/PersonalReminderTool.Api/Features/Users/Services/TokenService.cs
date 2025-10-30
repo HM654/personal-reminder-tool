@@ -38,15 +38,15 @@ internal sealed class TokenService(IConfiguration configuration)
         return token;
     }
 
-    public RefreshToken CreateRefreshTokenRecord(User user) => new RefreshToken
+    public RefreshToken CreateRefreshToken(string userId) => new RefreshToken
     {
         Id = Guid.NewGuid().ToString(),
-        Token = GenerateRefreshToken(),
+        Token = GenerateRefreshTokenString(),
         UtcExpiry = DateTime.UtcNow.AddDays(14),
-        UserId = user.Id
+        UserId = userId
     };
 
-    public string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+    public string GenerateRefreshTokenString() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
 
     public static CookieOptions CreateSecureCookieOptions() => new()
     {

@@ -27,6 +27,8 @@
     <PackageReference Include="TickerQ" Version="2.5.3" />
     <PackageReference Include="TickerQ.Dashboard" Version="2.5.3" />
     <PackageReference Include="TickerQ.EntityFrameworkCore" Version="2.5.3" />
+	<InternalsVisibleTo Include="PersonalReminderTool.Tests"/>
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
   </ItemGroup>
   
 </Project>

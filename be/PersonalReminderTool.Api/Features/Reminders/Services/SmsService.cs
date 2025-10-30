@@ -6,7 +6,7 @@ internal sealed class SmsService(IConfiguration configuration) : ISmsService
 {
     private readonly SmsClient _client = new SmsClient(configuration.GetConnectionString("AzureCommunicationServiceConnectionString"));
 
-    public async Task SendSmsAsync(string to, string message)
+    public async Task SendSmsAsync(string to, string message, CancellationToken cancellationToken)
     {
         var senderNumber = configuration.GetSection("Api").GetValue<string>("MobileSenderNumber");
         var partnerApiKey = configuration.GetSection("Api").GetValue<string>("PartnerApiKey")!;
@@ -20,7 +20,8 @@ internal sealed class SmsService(IConfiguration configuration) : ISmsService
             {
                 Tag = "reminder",
                 MessagingConnect = new MessagingConnectOptions(partnerApiKey, partner)
-            }
+            },
+            cancellationToken
         );
     }
 }

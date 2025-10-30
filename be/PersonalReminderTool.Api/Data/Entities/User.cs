@@ -1,6 +1,6 @@
 ﻿namespace PersonalReminderTool.Api.Data.Entities;
 
-public class User
+internal sealed class User
 {
     public required string Id { get; set; }
     public required string Email { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace PersonalReminderTool.Api.Data.Entities;
 
-public class RefreshToken
+internal sealed class RefreshToken
 {
     public required string Id { get; set; }
     public required string Token { get; set; }

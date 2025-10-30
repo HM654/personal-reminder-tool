@@ -3,4 +3,5 @@
     <Build />
   </Project>
   <Project Path="PersonalReminderTool.Api/PersonalReminderTool.Api.csproj" />
+  <Project Path="PersonalReminderTool.Tests/PersonalReminderTool.Tests.csproj" />
 </Solution>
