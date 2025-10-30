@@ -36,8 +36,11 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore be/PersonalReminderTool.slnx
 
+      - name: Build solution
+        run: dotnet build be/PersonalReminderTool.slnx --configuration Release --no-restore
+
       - name: Run tests
-        run: dotnet test be/PersonalReminderTool.Tests/PersonalReminderTool.Tests.csproj --no-build --verbosity normal
+        run: dotnet test be/PersonalReminderTool.Tests/PersonalReminderTool.Tests.csproj --verbosity normal
 
       - name: Azure Login
         uses: azure/login@v2
@@ -67,6 +70,7 @@ jobs:
           containerAppName: personal-reminder-tool
           resourceGroup: my-resource-group
           imageToBuild: personalremindertoolapi.azurecr.io/personal-reminder-tool:${{ github.sha }}
+
 
 
 
