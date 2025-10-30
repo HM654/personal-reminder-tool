@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout to the branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: Azure Login
         uses: azure/login@v2
@@ -48,6 +48,7 @@ jobs:
           containerAppName: personal-reminder-tool
           resourceGroup: my-resource-group
           imageToBuild: personalremindertoolapi.azurecr.io/personal-reminder-tool:${{ github.sha }}
+
 
 
 
