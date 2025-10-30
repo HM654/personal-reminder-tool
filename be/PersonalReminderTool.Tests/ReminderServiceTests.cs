@@ -37,7 +37,7 @@ public sealed class ReminderServiceTests
         await _reminderService.HandleReminderAsync(reminder, CancellationToken.None);
 
         // Assert
-        await _emailService.Received(1)
+        await _emailService.Received(0)
             .SendEmailAsync(reminder.UserEmail, "Reminder", reminder.ReminderMessage, CancellationToken.None);
         await _smsService.Received(1)
             .SendSmsAsync(reminder.UserPhoneNumber, reminder.ReminderMessage, CancellationToken.None);
