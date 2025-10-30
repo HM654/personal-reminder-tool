@@ -11,7 +11,7 @@ internal static class DatabaseExtensions
         services.AddDbContext<ApplicationDbContext>(async options =>
         {
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-            await options.SeedDataAsync(configuration);
+            options.SeedDataAsync(configuration);
         });
     }
 
@@ -22,11 +22,22 @@ internal static class DatabaseExtensions
         await db.Database.MigrateAsync();
     }
 
-    private static async Task SeedDataAsync(this DbContextOptionsBuilder options, IConfiguration configuration)
+    private static void SeedDataAsync(this DbContextOptionsBuilder options, IConfiguration configuration)
     {
         var baseUser = configuration
             .GetSection("BaseUser")
             .Get<User>()!;
+
+        options.UseAsyncSeeding(async (context, _, cancellationToken) =>
+        {
+            bool exists = await context.Set<User>().AnyAsync(u => u.Id == baseUser.Id, cancellationToken);
+
+            if (!exists)
+            {
+                await context.Set<User>().AddAsync(baseUser);
+                await context.SaveChangesAsync();
+            }
+        });
 
         options.UseSeeding((context, _) =>
         {
@@ -36,16 +47,6 @@ internal static class DatabaseExtensions
             {
                 context.Set<User>().Add(baseUser);
                 context.SaveChanges();
-            }
-        })
-        .UseAsyncSeeding(async (context, _, cancellationToken) =>
-        {
-            bool exists = await context.Set<User>().AnyAsync(u => u.Id == baseUser.Id, cancellationToken);
-
-            if (!exists)
-            {
-                await context.Set<User>().AddAsync(baseUser);
-                await context.SaveChangesAsync();
             }
         });
     }
