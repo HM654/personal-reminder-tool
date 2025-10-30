@@ -34,7 +34,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
-        run: dotnet restore be/PersonalReminderTool.sln
+        run: dotnet restore be/PersonalReminderTool.slnx
 
       - name: Run tests
         run: dotnet test be/PersonalReminderTool.Tests/PersonalReminderTool.Tests.csproj --no-build --verbosity normal
@@ -67,6 +67,7 @@ jobs:
           containerAppName: personal-reminder-tool
           resourceGroup: my-resource-group
           imageToBuild: personalremindertoolapi.azurecr.io/personal-reminder-tool:${{ github.sha }}
+
 
 
 
