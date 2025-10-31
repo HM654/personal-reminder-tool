@@ -25,7 +25,7 @@ internal static class UserEndpoints
         var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
         if (user is null)
-            return Results.BadRequest("User does not exist.");
+            return Results.Unauthorized();
 
         var passwordHasher = new PasswordHasher<User>();
         var result = passwordHasher.VerifyHashedPassword(user, user.Password, request.Password);
