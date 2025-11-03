@@ -2,7 +2,7 @@ name: Deploy Frontend static content to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
     paths:
     - 'fe/**'
     - '.github/workflows/github-pages.yml'
