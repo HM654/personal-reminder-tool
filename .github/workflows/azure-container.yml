@@ -1,4 +1,4 @@
-name: Trigger auto deployment for personal-reminder-tool
+name: Deploy Backend to Azure Container Apps
 
 on:
   push:
@@ -70,10 +70,3 @@ jobs:
           containerAppName: personal-reminder-tool
           resourceGroup: my-resource-group
           imageToBuild: personalremindertoolapi.azurecr.io/personal-reminder-tool:${{ github.sha }}
-
-
-
-
-
-
-
